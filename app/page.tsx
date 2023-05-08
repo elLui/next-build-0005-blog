@@ -1,3 +1,4 @@
+import Posts from "@/app/components/Posts";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
               this is a span, <span className="text-red-500">there are many like it</span>, but this one is mine.
           </span>
       </p>
+        <Posts />
 
 
 
