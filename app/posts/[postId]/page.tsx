@@ -7,16 +7,19 @@ export function generateMetadata({params}: { params: { postId: string } }) {
     const posts = getSortedPostsData();
     const {postId} = params;
 
-    const post = post.find(post => post.id === postId);
+    const post = posts.find(post => post.id === postId);
 
     if (!post) {
-        return {title: '404 - Not Found'};
-
+        return {
+            title: 'Not Found - DUDE',
+        }
     }
 
     return {
         title: post.title,
+
     }
+
 
 }
 
