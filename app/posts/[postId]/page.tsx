@@ -7,6 +7,20 @@ import getFormattedDate from "@/lib/getFormattedDate";
 import Link from "next/link";
 
 
+export function generateStaticParams() {
+
+    const posts = getSortedPostsData();
+
+    return posts.map(post => {
+        return {
+            params: {
+                postId: post.id
+            }
+        }
+    })
+}
+
+
 export function generateMetadata({params}: { params: { postId: string } }) {
 
     const posts = getSortedPostsData();
@@ -47,7 +61,7 @@ export default async function Post({params}: { params: { postId: string } }) {
             <h1 className="text-3xl mt-4 mb-0">
                 {title}
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm text-blue-700 hover:text-pink-500">
                 {formedDate}
             </p>
             <article>
