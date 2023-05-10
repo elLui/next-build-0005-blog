@@ -1,35 +1,52 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-
-
-
-const postsDirectory = path.join(process.cwd(), 'blogposts')
-
-
-export function getSortedPostsData() {
-    // Get file names under /posts
-    const fileNames = fs.readdirSync(postsDirectory);
-    const allPostsData = fileNames.map((fileName) => {
-        // Remove ".md" from file name to get id
-        const id = fileName.replace(/\.md$/, '');
-
-        // Read markdown file as string
-        const fullPath = path.join(postsDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
-
-        // Use gray-matter to parse the post metadata section
-        const matterResult = matter(fileContents);
-
-        const blogPost: BlogPost = {
-            id,
-            title: matterResult.data.title,
-            date: matterResult.data.date,
+type Filetree = {
+    "tree": [
+        {
+            "path": string,
         }
+    ]
+}
 
-        // Combine the data with the id
-        return blogPost
-    });
-    // Sort posts by date
-    return allPostsData.sort((a, b) => a.date < b.date ? 1 : -1);
+export async function getPostByName()
+
+
+
+export async function getPostMeta(): Promise<Meta[] | undefined> {
+
+    const res = await fetch('https://api.github.com/repos/ellui/next-build-0005-blog/git/trees/main?recursive=1', {
+        headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+            'X-GitHub-Api-Version': '2022-11-28',
+        }
+    })
+
+    // test the response for errors
+    if (!res.ok) {
+        console.error(res.statusText)
+        return undefined
+    }
+
+    // get raw response body
+    const repoFiletree: Filetree = await res.json();
+
+    // filter the tree for only .mdx files
+    const filesArray = repoFiletree.tree.map(obj => obj.path).filter(path => path.endsWith('.mdx'));
+
+    // create a container for the metadata
+    const posts: Meta[] = [];
+
+    // loop through the files and get the metadata
+    for (const file of filesArray) {
+        const post = await getPostByName(file);
+        if (post) {
+            const {meta} = post;
+            posts.push(meta);
+        }
+    }
+
+
+    // sort post by date
+    return posts.sort((a, b) => a.date < b.date ? 1 : -1);
+
+
 }
