@@ -6,7 +6,7 @@ type Filetree = {
     ]
 }
 
-export async function getPostByName()
+export async function getPostByName(fileName: string) Promise<Blogpost | undefined>
 
 
 
@@ -14,8 +14,8 @@ export async function getPostMeta(): Promise<Meta[] | undefined> {
 
     const res = await fetch('https://api.github.com/repos/ellui/next-build-0005-blog/git/trees/main?recursive=1', {
         headers: {
-            Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github+json',
+            'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
             'X-GitHub-Api-Version': '2022-11-28',
         }
     })
