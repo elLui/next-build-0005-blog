@@ -1,6 +1,6 @@
 import Posts from "@/app/components/Posts";
 
-
+// 86400 seconds === 1 day
 export const revalidate: number = 10;
 export default function Home() {
     return (
