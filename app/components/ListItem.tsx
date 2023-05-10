@@ -3,7 +3,7 @@ import getFormattedDate from "@/lib/getFormattedDate";
 
 
 type Props = {
-    post: BlogPost;
+    post: Meta
 };
 export default function ListItem({post}: Props) {
     const {id, title, date} = post;

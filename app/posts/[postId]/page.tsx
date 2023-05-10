@@ -1,15 +1,30 @@
 import {notFound} from "next/navigation";
 
-import {getSortedPostsData} from "@/lib/posts";
+import {getPostsMeta, getPostByName} from "@/lib/posts";
 
-import getPost from "@/lib/post";
 import getFormattedDate from "@/lib/getFormattedDate";
 import Link from "next/link";
 
+// nocache
+export const revalidate = 86400; // 24 hours
 
-export function generateStaticParams() {
 
-    const posts = getSortedPostsData();
+type Props = {
+    params: {
+        postId: string,
+    },
+}
+
+
+// having revalidate set to 0 means that the page will be regenerated on every request
+// that does not pair well with generateStaticParams
+export async function generateStaticParams() {
+
+    const posts = await getPostsMeta();
+    // if there are no posts, return an empty array
+    if (!posts) {
+        return [];
+    }
 
     return posts.map(post => {
         return {
@@ -21,55 +36,55 @@ export function generateStaticParams() {
 }
 
 
-export function generateMetadata({params}: { params: { postId: string } }) {
+export async function generateMetadata({params: {postId}}: Props) {
 
-    const posts = getSortedPostsData();
-    const {postId} = params;
-
-    const post = posts.find(post => post.id === postId);
+    const post = await getPostByName(`${postId}.mdx`);
 
     if (!post) {
         return {
             title: 'Not Found - DUDE',
         }
     }
-
     return {
-        title: post.title,
-
+        title: post.meta.title,
     }
-
 
 }
 
-export default async function Post({params}: { params: { postId: string } }) {
+export default async function Post({params: {postId}}: Props) {
 
-    const posts = getSortedPostsData();
-    const {postId} = params;
+    const post = await getPostByName(`${postId}.mdx`);
 
-    if (!posts.find(post => post.id === postId)) {
-        return notFound();
-    }
 
-    const {title, date, contentHtml} = await getPost(postId);
+    // return keyword is not required, since this is type never
+    if (!post) notFound();
 
-    const formedDate = getFormattedDate(date);
+    const {meta, content} = post;
+
+
+    const formedDate = getFormattedDate(meta.date);
+
+    const tags = meta.tags.map((tag, index) => (
+        <Link href={`/tags/${tag}`} key={index}>{tag}</Link>
+    ))
 
 
     return (
-        <main className="px-6 prose prose-xl prose-blue dark:prose-invert mx-auto">
-            <h1 className="text-3xl mt-4 mb-0">
-                {title}
-            </h1>
-            <p className="text-sm text-blue-700 hover:text-pink-500">
-                {formedDate}
-            </p>
+        <>
+            <h2 className="text-3xl mt-4 mb-0">{meta.title}</h2>
+            <p className="mt-0 text-sm">{formedDate}</p>
             <article>
-                <section dangerouslySetInnerHTML={{__html: contentHtml}}></section>
+                {content}
             </article>
-            <p className="mt-0 text-gray-500 text-sm">
-                <Link href={"/"}> ⬅ Patras a la casa </Link>
-            </p>
-        </main>
+            <section>
+                <h3>if you liked that, well hurhur</h3>
+                <div className="flex flex-row gap-4">
+                    {tags}
+                </div>
+            </section>
+            <div className="mb-10">
+                <Link href="/">🔙 back to posts 🔙</Link>
+            </div>
+        </>
     )
 }

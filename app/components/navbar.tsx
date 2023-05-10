@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import {FaTwitter, FaGithub, FaInstagram, FaLaptop} from "react-icons/all";
+import {FaTwitter, FaGithub, FaInstagram, FaLaptop} from "react-icons/fa";
 
 
 export default function Navbar() {

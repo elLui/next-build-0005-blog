@@ -8,6 +8,7 @@ type Filetree = {
     ],
 }
 
+
 export async function getPostByName(fileName: string): Promise<BlogPost | undefined> {
     const res = await fetch(`https://raw.githubusercontent.com/ellui/next-build-0005-blog/main/${fileName}`, {
         headers: {
@@ -17,23 +18,37 @@ export async function getPostByName(fileName: string): Promise<BlogPost | undefi
         },
     })
 
+    // test the response for errors
     if (!res.ok) {
         return undefined
     }
 
+    // get raw response body
     const rawMDX = await res.text();
 
+    // if the file is not found, return undefined
     if (rawMDX === '404: Not Found') {
         return undefined
     }
 
-    const {frontmatter, content} = await compileMDX<{ title: string, date: string, description: string[] }>({
+    // get the metadata and content from the MDX file
+    const {frontmatter, content} = await compileMDX<{ title: string, date: string, tags: string[] }>({
 
         source: rawMDX,
+        options: {
+            parseFrontmatter: true,
+        }
     })
 
+    // remove the .mdx extension from the file name
+    const id = fileName.replace(/\.mdx$/, '');
 
-    export async function getPostMeta(): Promise<Meta[] | undefined> {
+    // create a container for the metadata and content
+    return {meta: {id, title: frontmatter.title, date: frontmatter.date, tags: frontmatter.tags}, content};
+}
+
+
+    export async function getPostsMeta(): Promise<Meta[] | undefined> {
 
         const res = await fetch('https://api.github.com/repos/ellui/next-build-0005-blog/git/trees/main?recursive=1', {
             headers: {

@@ -12,5 +12,5 @@ type Meta = {
 type BlogPost = {
     meta: Meta,
     // TODO :: change any to correct type
-    content: any,
+    content: ReactElement<any, string | JSXElementConstructor<any>>,
 }
