@@ -1,11 +1,15 @@
 import Posts from "@/app/components/Posts";
+import ProfilePicture from "@/app/components/profilePicture";
 
 // 86400 seconds === 1 day
 export const revalidate: number = 10;
 export default function Home() {
     return (
 
-        <main className="px-6 mx-auto">
+        <main className="mx-auto">
+
+            <ProfilePicture />
+
             <p className="mt-12 mb-12 text-3xl text-center dark:text-white">
                 que onda and welcome 🏃‍♂️&nbsp;
                 <span className="">
@@ -13,6 +17,7 @@ export default function Home() {
           </span>
             </p>
 
+            {/* @ts-expect-error Server Component */}
             <Posts/>
 
         </main>
